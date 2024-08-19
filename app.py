@@ -46,6 +46,26 @@ def add_book():
         return redirect(url_for('index'))  # Redirect to the home page or any other page
    else:
         return render_template('add_book.html')
+   
+@app.route('/add_user', methods=('GET', 'POST'))
+def add_user():
+    # name TEXT NOT NULL,
+    # email TEXT UNIQUE NOT NULL,
+    # phone TEXT NOT NULL
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        if not name or not email or not phone:
+            return "All fields are required!", 400
+        conn = get_db_connection()
+        conn.execute('INSERT INTO users (name, email, phone) VALUES (?, ?, ?)',
+                    (name, email, phone))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('index'))  # Redirect to the home page or any other page
+    else:
+        return render_template('add_user.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
