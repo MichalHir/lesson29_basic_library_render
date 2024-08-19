@@ -66,6 +66,22 @@ def add_user():
         return redirect(url_for('index'))  # Redirect to the home page or any other page
     else:
         return render_template('add_user.html')
-
+@app.route('/login', methods=('GET', 'POST'))
+def login():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        if not name or not email:
+            return "All fields are required!", 400
+        print(name)
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE name = ? AND email = ?', (name, email)).fetchone()
+        conn.close()
+        if user:
+            print("User matched!")
+            return redirect(url_for('index'))
+        else:
+            return "Login failed: Incorrect name or email.", 401
+    return render_template('login.html')
 if __name__ == '__main__':
     app.run(debug=True)

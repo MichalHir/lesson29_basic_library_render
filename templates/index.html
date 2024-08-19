@@ -9,10 +9,11 @@
 <body>
     <h1>Welcome to the Library</h1>
     <nav>
+        <a href="{{ url_for('login') }}">Login</a>
         <a href="{{ url_for('show_books') }}">Books</a>
         <a href="{{ url_for('add_book') }}">Add a New Book</a>
         <a href="{{ url_for('show_users') }}">Users</a>
-        <a href="{{ url_for('add_user') }}">Add a New Book</a>
+        <a href="{{ url_for('add_user') }}">Add a New User</a>
     </nav>
 </body>
 </html>
