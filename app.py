@@ -1,11 +1,11 @@
 from flask import Flask, render_template,request,redirect,url_for, session, flash
 import sqlite3
-# from dotenv import load_dotenv
-# import os
+from dotenv import load_dotenv
+import os
 # Load environment variables from .env file
-# load_dotenv()
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
 # Raise an error in production if SECRET_KEY is not set
 # if app.config['ENV'] == 'production' and not os.getenv('SECRET_KEY'):
 #     raise RuntimeError("SECRET_KEY environment variable not set in production environment.")
@@ -102,7 +102,7 @@ def login():
             print("User matched!")
             return redirect(url_for('dashboard'))
         else:
-            flash('Login successful!', 'success')
+            flash('Login unsuccessful!')
             return redirect(url_for('login'))
             # return "Login failed: Incorrect name or email.", 401
     return render_template('login.html')
