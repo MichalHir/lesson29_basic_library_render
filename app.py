@@ -102,7 +102,9 @@ def login():
             print("User matched!")
             return redirect(url_for('dashboard'))
         else:
-            return "Login failed: Incorrect name or email.", 401
+            flash('Login successful!', 'success')
+            return redirect(url_for('login'))
+            # return "Login failed: Incorrect name or email.", 401
     return render_template('login.html')
 @app.route('/dashboard')
 def dashboard():
