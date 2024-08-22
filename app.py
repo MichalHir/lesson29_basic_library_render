@@ -1,7 +1,12 @@
-from flask import Flask, render_template,request,redirect,url_for
+from flask import Flask, render_template,request,redirect,url_for, session, flash
 import sqlite3
-
+from dotenv import load_dotenv
+import os
+# Load environment variables from .env file
+load_dotenv()
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY')  # Get the secret key from the environment variable
+
 
 def get_db_connection():
     conn = sqlite3.connect('library.db')
@@ -10,10 +15,17 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'username' in session:
+        username = session['username']
+        return render_template('index.html', username= session['username'])
+    else:
+        flash('You need to login first.', 'warning')
+        return redirect(url_for('login'))
 
-@app.route('/books')
+@app.route('/books', methods=('GET', 'POST'))
 def show_books():
+    # if 'username' not in session:
+    #     return render_template('login.html')
     conn = get_db_connection()
     books = conn.execute('SELECT * FROM books').fetchall()
     conn.close()
@@ -21,6 +33,8 @@ def show_books():
 
 @app.route('/users')
 def show_users():
+    # if 'username' not in session:
+    #     return render_template('login.html')
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
     conn.close()
@@ -30,6 +44,8 @@ def show_users():
 # Route to display the form and add a new book
 @app.route('/add_book', methods=('GET', 'POST'))
 def add_book():
+#    if 'username' not in session:
+#         return render_template('login.html')
    if request.method == 'POST':
         title = request.form.get('title')
         author = request.form.get('author')
@@ -63,7 +79,7 @@ def add_user():
                     (name, email, phone))
         conn.commit()
         conn.close()
-        return redirect(url_for('index'))  # Redirect to the home page or any other page
+        return redirect(url_for('login'))  # Redirect to the home page or any other page
     else:
         return render_template('add_user.html')
 @app.route('/login', methods=('GET', 'POST'))
@@ -77,11 +93,27 @@ def login():
         conn = get_db_connection()
         user = conn.execute('SELECT * FROM users WHERE name = ? AND email = ?', (name, email)).fetchone()
         conn.close()
-        if user:
+        if user and user["email"] == email:
+            session['username'] = user["name"]
+            flash('Login successful!', 'success')
             print("User matched!")
-            return redirect(url_for('index'))
+            return redirect(url_for('dashboard'))
         else:
             return "Login failed: Incorrect name or email.", 401
     return render_template('login.html')
+@app.route('/dashboard')
+def dashboard():
+    if 'username' in session:
+        username = session['username']
+        return render_template('index.html', username=username)
+    else:
+        flash('You need to log in first!', 'warning')
+    return redirect(url_for('login'))
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
+
 if __name__ == '__main__':
     app.run(debug=True)

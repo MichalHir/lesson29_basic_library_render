@@ -8,8 +8,10 @@
 </head>
 <body>
     <h1>Welcome to the Library</h1>
+    <p>Welcome, {{ username }}!</p>
     <nav>
         <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
         <a href="{{ url_for('show_books') }}">Books</a>
         <a href="{{ url_for('add_book') }}">Add a New Book</a>
         <a href="{{ url_for('show_users') }}">Users</a>
