@@ -6,6 +6,9 @@ import os
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')  # Get the secret key from the environment variable
+# Raise an error in production if SECRET_KEY is not set
+if app.config['ENV'] == 'production' and not os.getenv('SECRET_KEY'):
+    raise RuntimeError("SECRET_KEY environment variable not set in production environment.")
 
 
 def get_db_connection():
